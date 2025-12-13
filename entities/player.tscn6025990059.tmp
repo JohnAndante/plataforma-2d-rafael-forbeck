@@ -1,18 +1,12 @@
-[gd_scene load_steps=21 format=3 uid="uid://dj4dctx6mm3ju"]
+[gd_scene load_steps=17 format=3 uid="uid://dj4dctx6mm3ju"]
 
 [ext_resource type="Script" uid="uid://xeffgv1ctbx8" path="res://scripts/player.gd" id="1_merdl"]
 [ext_resource type="Texture2D" uid="uid://6vurcg7p1qxg" path="res://sprites/1 - Penguin/Idle (16 x 16).png" id="2_b0kkn"]
-[ext_resource type="Texture2D" uid="uid://derb0mrjdm7p7" path="res://sprites/1 - Penguin/Falling (16 x 16).png" id="2_qly61"]
 [ext_resource type="Texture2D" uid="uid://brtdertjicklm" path="res://sprites/1 - Penguin/Waddling (16 x 16).png" id="3_e4p34"]
-[ext_resource type="Texture2D" uid="uid://cseb1q1ncpwb6" path="res://sprites/1 - Penguin/Jump (16 x 16).png" id="4_qsoyl"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_4qnqm"]
 radius = 2.8409088
 height = 9.090908
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_q0i8f"]
-atlas = ExtResource("2_qly61")
-region = Rect2(0, 0, 16, 16)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_e4p34"]
 atlas = ExtResource("2_b0kkn")
@@ -33,10 +27,6 @@ region = Rect2(48, 0, 16, 16)
 [sub_resource type="AtlasTexture" id="AtlasTexture_6nm46"]
 atlas = ExtResource("2_b0kkn")
 region = Rect2(64, 0, 16, 16)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_0i614"]
-atlas = ExtResource("4_qsoyl")
-region = Rect2(0, 0, 16, 16)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_i623q"]
 atlas = ExtResource("3_e4p34")
@@ -66,14 +56,6 @@ region = Rect2(80, 0, 16, 16)
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_q0i8f")
-}],
-"loop": true,
-"name": &"falling",
-"speed": 5.0
-}, {
-"frames": [{
-"duration": 1.0,
 "texture": SubResource("AtlasTexture_e4p34")
 }, {
 "duration": 1.0,
@@ -91,14 +73,6 @@ animations = [{
 "loop": true,
 "name": &"idle",
 "speed": 8.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_0i614")
-}],
-"loop": true,
-"name": &"jump",
-"speed": 5.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -128,7 +102,6 @@ animations = [{
 script = ExtResource("1_merdl")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-visible = false
 scale = Vector2(1.7600002, 1.7600002)
 shape = SubResource("CapsuleShape2D_4qnqm")
 
@@ -136,11 +109,4 @@ shape = SubResource("CapsuleShape2D_4qnqm")
 sprite_frames = SubResource("SpriteFrames_merdl")
 animation = &"idle"
 autoplay = "idle"
-
-[node name="Camera2D" type="Camera2D" parent="."]
-limit_left = 0
-limit_top = 0
-limit_right = 870
-limit_bottom = 200
-limit_smoothed = true
-drag_horizontal_enabled = true
+frame_progress = 0.40294445

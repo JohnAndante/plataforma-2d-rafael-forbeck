@@ -142,7 +142,7 @@ tile_map_data = PackedByteArray("AAAEAAoABAABAAEAAAARAAoABAABAAEAAAAVAAoABAABAAE
 tile_set = ExtResource("9_gwku7")
 
 [node name="Player" parent="." instance=ExtResource("1_e2knd")]
-position = Vector2(128, 146)
+position = Vector2(14, 185)
 
 [node name="Camera" parent="." instance=ExtResource("9_jo4av")]
 limit_top = 0
@@ -151,3 +151,4 @@ limit_right = 850
 [node name="LevelEnd" parent="." instance=ExtResource("12_64es3")]
 position = Vector2(860, 95)
 scale = Vector2(1, 12.159998)
+next_level = "tropic"

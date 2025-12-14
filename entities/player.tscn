@@ -124,7 +124,7 @@ animations = [{
 "speed": 8.0
 }]
 
-[node name="Player" type="CharacterBody2D"]
+[node name="Player" type="CharacterBody2D" groups=["Player"]]
 script = ExtResource("1_merdl")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
@@ -136,9 +136,3 @@ z_index = 1
 sprite_frames = SubResource("SpriteFrames_merdl")
 animation = &"idle"
 autoplay = "idle"
-
-[node name="Camera2D" type="Camera2D" parent="."]
-limit_left = 0
-limit_bottom = 208
-limit_smoothed = true
-drag_horizontal_enabled = true

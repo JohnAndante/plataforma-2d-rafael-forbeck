@@ -128,7 +128,6 @@ animations = [{
 script = ExtResource("1_merdl")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-visible = false
 scale = Vector2(1.7600002, 1.7600002)
 shape = SubResource("CapsuleShape2D_4qnqm")
 
@@ -141,7 +140,6 @@ autoplay = "idle"
 [node name="Camera2D" type="Camera2D" parent="."]
 limit_left = 0
 limit_top = 0
-limit_right = 870
-limit_bottom = 200
+limit_bottom = 208
 limit_smoothed = true
 drag_horizontal_enabled = true

@@ -1,14 +1,32 @@
-[gd_scene load_steps=21 format=3 uid="uid://dj4dctx6mm3ju"]
+[gd_scene load_steps=27 format=3 uid="uid://dj4dctx6mm3ju"]
 
 [ext_resource type="Script" uid="uid://xeffgv1ctbx8" path="res://scripts/player.gd" id="1_merdl"]
+[ext_resource type="Texture2D" uid="uid://d3t3jn5tj8mrk" path="res://sprites/1 - Penguin/Belly_Sliding (16 x 16).png" id="2_6nm46"]
 [ext_resource type="Texture2D" uid="uid://6vurcg7p1qxg" path="res://sprites/1 - Penguin/Idle (16 x 16).png" id="2_b0kkn"]
 [ext_resource type="Texture2D" uid="uid://derb0mrjdm7p7" path="res://sprites/1 - Penguin/Falling (16 x 16).png" id="2_qly61"]
+[ext_resource type="Texture2D" uid="uid://drm40y6y877j5" path="res://sprites/1 - Penguin/Ducking (16 x 16).png" id="2_qsoyl"]
 [ext_resource type="Texture2D" uid="uid://brtdertjicklm" path="res://sprites/1 - Penguin/Waddling (16 x 16).png" id="3_e4p34"]
 [ext_resource type="Texture2D" uid="uid://cseb1q1ncpwb6" path="res://sprites/1 - Penguin/Jump (16 x 16).png" id="4_qsoyl"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_4qnqm"]
 radius = 2.8409088
 height = 9.090908
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8rie4"]
+atlas = ExtResource("2_6nm46")
+region = Rect2(0, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dp3pk"]
+atlas = ExtResource("2_6nm46")
+region = Rect2(16, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_cgp7q"]
+atlas = ExtResource("2_6nm46")
+region = Rect2(32, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_oprnr"]
+atlas = ExtResource("2_qsoyl")
+region = Rect2(0, 0, 16, 16)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_q0i8f"]
 atlas = ExtResource("2_qly61")
@@ -64,6 +82,28 @@ region = Rect2(80, 0, 16, 16)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_merdl"]
 animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8rie4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dp3pk")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_cgp7q")
+}],
+"loop": false,
+"name": &"dash",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_oprnr")
+}],
+"loop": true,
+"name": &"duck",
+"speed": 5.0
+}, {
 "frames": [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_q0i8f")
@@ -136,5 +176,7 @@ shape = SubResource("CapsuleShape2D_4qnqm")
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 z_index = 1
 sprite_frames = SubResource("SpriteFrames_merdl")
-animation = &"idle"
+animation = &"dash"
 autoplay = "idle"
+frame = 2
+frame_progress = 1.0

@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=4 uid="uid://gmoncpafos5d"]
+[gd_scene load_steps=15 format=4 uid="uid://gmoncpafos5d"]
 
 [ext_resource type="PackedScene" uid="uid://dj4dctx6mm3ju" path="res://entities/player.tscn" id="1_e2knd"]
 [ext_resource type="TileSet" uid="uid://cqbpfv6r60jh2" path="res://tilemaps/terrain.tres" id="2_2xpkg"]
@@ -11,6 +11,7 @@
 [ext_resource type="Texture2D" uid="uid://myxe8ac877qd" path="res://sprites/Seasonal Tilesets/2 - Autumn Forest/Background parts/1 - Leaf_top.png" id="8_qxlj4"]
 [ext_resource type="TileSet" uid="uid://cyp2l60aorx5v" path="res://tilemaps/decoration.tres" id="9_gwku7"]
 [ext_resource type="PackedScene" uid="uid://despiuhlr8mwn" path="res://entities/camera.tscn" id="9_jo4av"]
+[ext_resource type="PackedScene" uid="uid://bgh04hv32hap7" path="res://entities/level_end.tscn" id="12_64es3"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_gwku7"]
 texture = ExtResource("3_jxvlp")
@@ -56,6 +57,7 @@ texture = ExtResource("3_jxvlp")
 sources/0 = SubResource("TileSetAtlasSource_gwku7")
 
 [node name="Forest" type="Node2D"]
+metadata/_edit_vertical_guides_ = [850.0]
 
 [node name="ParallaxBackground" type="ParallaxBackground" parent="."]
 
@@ -145,3 +147,7 @@ position = Vector2(128, 146)
 [node name="Camera" parent="." instance=ExtResource("9_jo4av")]
 limit_top = 0
 limit_right = 850
+
+[node name="LevelEnd" parent="." instance=ExtResource("12_64es3")]
+position = Vector2(860, 95)
+scale = Vector2(1, 12.159998)

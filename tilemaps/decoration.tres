@@ -1,9 +1,10 @@
-[gd_resource type="TileSet" load_steps=9 format=3 uid="uid://cyp2l60aorx5v"]
+[gd_resource type="TileSet" load_steps=11 format=3 uid="uid://cyp2l60aorx5v"]
 
 [ext_resource type="Texture2D" uid="uid://cx1dkjh2hk8" path="res://sprites/Seasonal Tilesets/1 - Grassland/Grassland_entities (16 x 16).png" id="1_ar688"]
 [ext_resource type="Texture2D" uid="uid://ckpv6n4rf862e" path="res://sprites/Seasonal Tilesets/5 - Misc. universal tiles/Flowers (16 x 16).png" id="2_uvygf"]
 [ext_resource type="Texture2D" uid="uid://d3rmiwwa1rt5n" path="res://sprites/Seasonal Tilesets/5 - Misc. universal tiles/House (112 x 96).png" id="3_oniqj"]
 [ext_resource type="Texture2D" uid="uid://bfd7msutvockw" path="res://sprites/Seasonal Tilesets/3 - Tropics/Tropics_entities (16 x 16).png" id="4_uvygf"]
+[ext_resource type="Texture2D" uid="uid://dftbbihlbx6je" path="res://sprites/Seasonal Tilesets/2 - Autumn Forest/Autumn_entities (16 x 16).png" id="5_oniqj"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_xwcet"]
 resource_name = "Grassland"
@@ -83,8 +84,37 @@ texture = ExtResource("4_uvygf")
 12:6/0 = 0
 12:6/0/z_index = 2
 
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_4gqq8"]
+resource_name = "Autumn Entities"
+texture = ExtResource("5_oniqj")
+9:1/0 = 0
+10:1/0 = 0
+11:1/0 = 0
+15:1/0 = 0
+16:1/0 = 0
+17:1/0 = 0
+9:3/0 = 0
+10:3/0 = 0
+11:3/0 = 0
+12:3/0 = 0
+14:3/0 = 0
+15:3/0 = 0
+16:3/0 = 0
+17:3/0 = 0
+18:3/0 = 0
+14:4/0 = 0
+16:4/0 = 0
+18:4/0 = 0
+1:5/0 = 0
+3:5/0 = 0
+1:1/size_in_atlas = Vector2i(3, 3)
+1:1/0 = 0
+5:1/size_in_atlas = Vector2i(3, 3)
+5:1/0 = 0
+
 [resource]
 sources/0 = SubResource("TileSetAtlasSource_xwcet")
 sources/1 = SubResource("TileSetAtlasSource_p1ry8")
 sources/2 = SubResource("TileSetAtlasSource_xlg7c")
 sources/3 = SubResource("TileSetAtlasSource_oniqj")
+sources/4 = SubResource("TileSetAtlasSource_4gqq8")

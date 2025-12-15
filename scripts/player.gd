@@ -28,27 +28,6 @@ var curr_direction: Vector2 = Vector2.RIGHT;
 var dash_timer
 var jump_count := 0
 
-func move(delta: float):
-	update_direction()
-	
-	# Get the input direction and handle the movement/deceleration.
-	# As good practice, you should replace UI actions with custom gameplay actions.
-	var direction := Input.get_axis("left", "right")
-	
-	if PlayerState.dash:
-		velocity.x = move_toward(velocity.x, direction * MAX_SPEED, DASH_AIR_FRICTION * delta)
-		return
-	
-	if PlayerState.dashed_fall || PlayerState.dashed_jump:
-		velocity.x = move_toward(velocity.x, direction * MAX_SPEED, DASH_AIR_FRICTION * delta)
-		#velocity.x = direction * MAX_SPEED
-		return
-
-	if direction:
-		velocity.x = move_toward(velocity.x, direction * MAX_SPEED, ACCELERATION * delta)
-	else:
-		velocity.x = move_toward(velocity.x, 0, DECELERATION * delta)
-
 func _ready() -> void:
 	go_to_idle_state()
 
@@ -149,7 +128,7 @@ func idle_state(delta: float):
 		go_to_dash_state()
 		return
 
-func duck_state(delta: float):
+func duck_state(_delta: float):
 	move_until_stopped()
 	
 	if Input.is_action_just_released("down"):
@@ -200,8 +179,6 @@ func dash_state(delta: float):
 		else:
 			go_to_fall_state()
 		return
-		
-
 
 func jump_state(delta: float):
 	move(delta)
@@ -273,6 +250,27 @@ func dashed_fall_state(delta: float):
 	if abs(velocity.x) < MAX_SPEED:
 		go_to_fall_state()
 		return
+
+func move(delta: float):
+	update_direction()
+	
+	# Get the input direction and handle the movement/deceleration.
+	# As good practice, you should replace UI actions with custom gameplay actions.
+	var direction := Input.get_axis("left", "right")
+	
+	if PlayerState.dash:
+		velocity.x = move_toward(velocity.x, direction * MAX_SPEED, DASH_AIR_FRICTION * delta)
+		return
+	
+	if PlayerState.dashed_fall || PlayerState.dashed_jump:
+		velocity.x = move_toward(velocity.x, direction * MAX_SPEED, DASH_AIR_FRICTION * delta)
+		#velocity.x = direction * MAX_SPEED
+		return
+	
+	if direction:
+		velocity.x = move_toward(velocity.x, direction * MAX_SPEED, ACCELERATION * delta)
+	else:
+		velocity.x = move_toward(velocity.x, 0, DECELERATION * delta)
 
 func update_direction():
 	var direction := Input.get_axis("left", "right")

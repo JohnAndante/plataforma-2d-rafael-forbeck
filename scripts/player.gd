@@ -8,6 +8,7 @@ const JUMP_VELOCITY = -300.0
 const DASH_VELOCITY = 200
 const DASH_AIR_FRICTION = 600.0
 const DASH_DURATION_SECONDS = 0.5
+@export var MAX_JUMP_COUNTS = 2
 
 enum PlayerState {
 	idle,
@@ -23,6 +24,7 @@ enum PlayerState {
 var curr_state: PlayerState
 var curr_direction: Vector2 = Vector2.RIGHT;
 var dash_timer
+var jump_count := 0
 
 func _ready() -> void:
 	go_to_idle_state()
@@ -87,6 +89,7 @@ func go_to_jump_state():
 	curr_state = PlayerState.jump
 	anim.play("jump")
 	velocity.y = JUMP_VELOCITY
+	jump_count += 1
 
 func go_to_dashed_jump_state():
 	curr_state = PlayerState.dashed_jump
@@ -170,23 +173,25 @@ func dash_state():
 func jump_state():
 	move()
 	
-	if velocity.y < 0 and Input.is_action_just_released("jump"):
+	if velocity.y < 0 && Input.is_action_just_released("jump"):
 		go_to_fall_state()
-	
+		return
 	if velocity.y > 0:
 		go_to_fall_state()
 		return
 		
-	if velocity.y == 0:
-		if is_on_floor() and velocity.x == 0:
-			if Input.is_action_pressed("down"):
-				go_to_duck_state()
-			else:
-				go_to_idle_state()
-			return
-		if is_on_floor() and velocity.x != 0:
-			go_to_walk_state()
-			return
+	if velocity.y != 0 || !is_on_floor():
+		return
+		
+	if velocity.x == 0:
+		if Input.is_action_pressed("down"):
+			go_to_duck_state()
+		else:
+			go_to_idle_state()
+		return
+	if velocity.x != 0:
+		go_to_walk_state()
+		return
 
 func dashed_jump_state():
 	apply_air_inertia()
@@ -201,13 +206,22 @@ func dashed_jump_state():
 func fall_state():
 	move()
 	
-	if velocity.y == 0:
-		if is_on_floor() and velocity.x == 0:
-			go_to_idle_state()
-			return
-		if is_on_floor() and velocity.x != 0:
-			go_to_walk_state()
-			return
+	if Input.is_action_just_pressed("jump") && jump_count < MAX_JUMP_COUNTS:
+		go_to_jump_state()
+	
+	if velocity.y != 0:
+		return 
+	if !is_on_floor():
+		return
+		
+	jump_count = 0
+	
+	if velocity.x == 0:
+		go_to_idle_state()
+		return
+	if velocity.x != 0:
+		go_to_walk_state()
+		return
 
 func dashed_fall_state():
 	apply_air_inertia()

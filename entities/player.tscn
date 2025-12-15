@@ -170,13 +170,12 @@ collision_mask = 9
 script = ExtResource("1_merdl")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+z_index = 2
 scale = Vector2(1.7600002, 1.7600002)
 shape = SubResource("CapsuleShape2D_4qnqm")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 z_index = 1
 sprite_frames = SubResource("SpriteFrames_merdl")
-animation = &"dash"
+animation = &"duck"
 autoplay = "idle"
-frame = 2
-frame_progress = 1.0

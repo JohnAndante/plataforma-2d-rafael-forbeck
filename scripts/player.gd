@@ -1,6 +1,7 @@
 extends CharacterBody2D
 
 @onready var anim: AnimatedSprite2D = $AnimatedSprite2D
+@onready var collision_shape: CollisionShape2D = $CollisionShape2D
 
 const SPEED = 80.0
 const JUMP_VELOCITY = -300.0
@@ -58,6 +59,11 @@ func go_to_idle_state():
 func go_to_duck_state():
 	curr_state = PlayerState.duck
 	anim.play("duck")
+	
+	set_lower_collision()
+
+func exit_from_duck_state():
+	set_regular_collision()
 
 func go_to_walk_state():
 	curr_state = PlayerState.walk
@@ -71,6 +77,11 @@ func go_to_dash_state():
 	velocity.x = dash_direction * DASH_VELOCITY
 	
 	dash_timer = DASH_DURATION_SECONDS
+	
+	set_lower_collision()
+
+func exit_from_dash_state(): 
+	set_regular_collision()
 
 func go_to_jump_state():
 	curr_state = PlayerState.jump
@@ -116,6 +127,7 @@ func duck_state():
 	move_until_stopped()
 	
 	if Input.is_action_just_released("down"):
+		exit_from_duck_state()
 		go_to_idle_state()
 		return
 
@@ -142,10 +154,13 @@ func dash_state():
 	dash_timer -= get_physics_process_delta_time()
 	
 	if Input.is_action_just_pressed("jump") and is_on_floor():
+		exit_from_dash_state()
 		go_to_dashed_jump_state()
 		return
 	
 	if Input.is_action_just_released("dash") or dash_timer <= 0:
+		exit_from_dash_state()
+		
 		if is_on_floor():
 			go_to_idle_state()
 		else:
@@ -174,12 +189,11 @@ func jump_state():
 			return
 
 func dashed_jump_state():
-	velocity.x = move_toward(velocity.x, 0, DASH_AIR_FRICTION * get_physics_process_delta_time())
+	apply_air_inertia()
 	
 	if velocity.y < 0 and Input.is_action_just_released("jump"):
 		go_to_dashed_fall_state()
 		return
-	
 	if velocity.y > 0:
 		go_to_dashed_fall_state()
 		return
@@ -196,7 +210,7 @@ func fall_state():
 			return
 
 func dashed_fall_state():
-	velocity.x = move_toward(velocity.x, 0, DASH_AIR_FRICTION * get_physics_process_delta_time())
+	apply_air_inertia()
 	
 	if is_on_floor():
 		if velocity.x == 0:
@@ -204,20 +218,13 @@ func dashed_fall_state():
 		else:
 			go_to_walk_state()
 		return
-	
 	if abs(velocity.x) < SPEED:
 		go_to_fall_state()
 		return
 
-func move():
-	# Get the input direction and handle the movement/deceleration.
-	# As good practice, you should replace UI actions with custom gameplay actions.
+func update_direction():
 	var direction := Input.get_axis("left", "right")
-	if direction:
-		velocity.x = direction * SPEED
-	else:
-		velocity.x = move_toward(velocity.x, 0, SPEED)
-		
+	
 	# Change sprite flip based on direction
 	# Its elif insted of else to not force a single direction when 0
 	if direction > 0:
@@ -227,37 +234,34 @@ func move():
 		anim.flip_h = true
 		curr_direction = Vector2.LEFT;
 
-func move_until_stopped():
-	# Used when player can't move
-	# Apply current velocity until zero
-	velocity.x = move_toward(velocity.x, 0, SPEED)
+func move():
+	update_direction()
 	
-func apply_air_inertia(delta: float):
-	velocity.x = move_toward(velocity.x, 0, DASH_AIR_FRICTION * delta)
-
-func temp(_delta: float) -> void:
-	# Handle jump.
-	if Input.is_action_just_pressed("jump") and is_on_floor():
-		velocity.y = JUMP_VELOCITY
-
 	# Get the input direction and handle the movement/deceleration.
 	# As good practice, you should replace UI actions with custom gameplay actions.
 	var direction := Input.get_axis("left", "right")
+
 	if direction:
 		velocity.x = direction * SPEED
 	else:
 		velocity.x = move_toward(velocity.x, 0, SPEED)
 
-		
-	if is_on_floor():
-		if direction > 0:
-			anim.play("walk")
-		elif direction < 0:
-			anim.play("walk")
-		else:
-			anim.play("idle")
-	else:
-		if velocity.y < 0:
-			anim.play("jump")
-		if velocity.y > 0:
-			anim.play("falling")
+func move_until_stopped():
+	update_direction()
+	
+	# Used when player can't move
+	# Apply current velocity until zero
+	velocity.x = move_toward(velocity.x, 0, SPEED)
+	
+func apply_air_inertia():
+	velocity.x = move_toward(velocity.x, 0, DASH_AIR_FRICTION * get_physics_process_delta_time())
+
+func set_lower_collision():
+	collision_shape.shape.radius = 2.84
+	collision_shape.shape.height = 5.68
+	collision_shape.position.y = 3
+
+func set_regular_collision():
+	collision_shape.shape.radius = 2.84
+	collision_shape.shape.height = 9.09
+	collision_shape.position.y = 0	

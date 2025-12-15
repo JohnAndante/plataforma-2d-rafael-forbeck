@@ -3,11 +3,13 @@ extends CharacterBody2D
 @onready var anim: AnimatedSprite2D = $AnimatedSprite2D
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
 
-const SPEED = 80.0
+@export var MAX_SPEED = 80.0
 const JUMP_VELOCITY = -300.0
-const DASH_VELOCITY = 200
-const DASH_AIR_FRICTION = 600.0
-const DASH_DURATION_SECONDS = 0.5
+@export var ACCELERATION = 3.5 * 1000
+@export var DECELERATION = 3 * 1000
+const DASH_MAX_SPEED = 200
+const DASH_AIR_FRICTION = 200
+const DASH_DURATION_SECONDS = 1
 @export var MAX_JUMP_COUNTS = 2
 
 enum PlayerState {
@@ -26,6 +28,27 @@ var curr_direction: Vector2 = Vector2.RIGHT;
 var dash_timer
 var jump_count := 0
 
+func move(delta: float):
+	update_direction()
+	
+	# Get the input direction and handle the movement/deceleration.
+	# As good practice, you should replace UI actions with custom gameplay actions.
+	var direction := Input.get_axis("left", "right")
+	
+	if PlayerState.dash:
+		velocity.x = move_toward(velocity.x, direction * MAX_SPEED, DASH_AIR_FRICTION * delta)
+		return
+	
+	if PlayerState.dashed_fall || PlayerState.dashed_jump:
+		velocity.x = move_toward(velocity.x, direction * MAX_SPEED, DASH_AIR_FRICTION * delta)
+		#velocity.x = direction * MAX_SPEED
+		return
+
+	if direction:
+		velocity.x = move_toward(velocity.x, direction * MAX_SPEED, ACCELERATION * delta)
+	else:
+		velocity.x = move_toward(velocity.x, 0, DECELERATION * delta)
+
 func _ready() -> void:
 	go_to_idle_state()
 
@@ -37,21 +60,21 @@ func _physics_process(delta:float) -> void:
 		
 	match curr_state:
 		PlayerState.idle:
-			idle_state()
+			idle_state(delta)
 		PlayerState.walk:
-			walk_state()
+			walk_state(delta)
 		PlayerState.jump:
-			jump_state()
+			jump_state(delta)
 		PlayerState.fall:
-			fall_state()
+			fall_state(delta)
 		PlayerState.duck:
-			duck_state()
+			duck_state(delta)
 		PlayerState.dash:
-			dash_state()
+			dash_state(delta)
 		PlayerState.dashed_jump:
-			dashed_jump_state()
+			dashed_jump_state(delta)
 		PlayerState.dashed_fall:
-			dashed_fall_state()
+			dashed_fall_state(delta)
 	move_and_slide()
 
 func go_to_idle_state():
@@ -76,7 +99,7 @@ func go_to_dash_state():
 	anim.play("dash")
 	
 	var dash_direction = curr_direction.x
-	velocity.x = dash_direction * DASH_VELOCITY
+	velocity.x = dash_direction * DASH_MAX_SPEED
 	
 	dash_timer = DASH_DURATION_SECONDS
 	
@@ -98,7 +121,7 @@ func go_to_dashed_jump_state():
 
 func go_to_fall_state():
 	if velocity.y < 0:
-		velocity.y = move_toward(velocity.y, 0, SPEED)
+		velocity.y = move_toward(velocity.y, 0, MAX_SPEED)
 		
 	curr_state = PlayerState.fall
 	anim.play("falling")
@@ -107,8 +130,8 @@ func go_to_dashed_fall_state():
 	curr_state = PlayerState.dashed_fall
 	anim.play("falling")
 
-func idle_state():
-	move()
+func idle_state(delta: float):
+	move(delta)
 		
 	if velocity.x != 0:
 		go_to_walk_state()
@@ -126,7 +149,7 @@ func idle_state():
 		go_to_dash_state()
 		return
 
-func duck_state():
+func duck_state(delta: float):
 	move_until_stopped()
 	
 	if Input.is_action_just_released("down"):
@@ -134,8 +157,8 @@ func duck_state():
 		go_to_idle_state()
 		return
 
-func walk_state():
-	move()
+func walk_state(delta: float):
+	move(delta)
 	
 	if velocity.x == 0:
 		go_to_idle_state()
@@ -143,7 +166,8 @@ func walk_state():
 	if Input.is_action_just_pressed("jump"):
 		go_to_jump_state()
 		return
-	if !is_on_floor() and velocity.y > 0:
+	if !is_on_floor():
+		jump_count += 1
 		go_to_fall_state()
 		return
 	if Input.is_action_just_pressed("down"):
@@ -153,8 +177,15 @@ func walk_state():
 		go_to_dash_state()
 		return
 
-func dash_state():
-	dash_timer -= get_physics_process_delta_time()
+func dash_state(delta: float):
+	dash_timer -= delta
+	move(delta)
+	
+	if !is_on_floor() && Input.is_action_just_pressed("jump"):
+		jump_count -= 1
+		if can_double_jump():
+			go_to_jump_state()
+			return
 	
 	if Input.is_action_just_pressed("jump") and is_on_floor():
 		exit_from_dash_state()
@@ -169,9 +200,11 @@ func dash_state():
 		else:
 			go_to_fall_state()
 		return
+		
 
-func jump_state():
-	move()
+
+func jump_state(delta: float):
+	move(delta)
 	
 	if velocity.y < 0 && Input.is_action_just_released("jump"):
 		go_to_fall_state()
@@ -193,8 +226,8 @@ func jump_state():
 		go_to_walk_state()
 		return
 
-func dashed_jump_state():
-	apply_air_inertia()
+func dashed_jump_state(delta: float):
+	move(delta)
 	
 	if velocity.y < 0 and Input.is_action_just_released("jump"):
 		go_to_dashed_fall_state()
@@ -203,11 +236,12 @@ func dashed_jump_state():
 		go_to_dashed_fall_state()
 		return
 
-func fall_state():
-	move()
+func fall_state(delta: float):
+	move(delta)
 	
-	if Input.is_action_just_pressed("jump") && jump_count < MAX_JUMP_COUNTS:
+	if Input.is_action_just_pressed("jump") && can_double_jump():
 		go_to_jump_state()
+		return
 	
 	if velocity.y != 0:
 		return 
@@ -223,8 +257,12 @@ func fall_state():
 		go_to_walk_state()
 		return
 
-func dashed_fall_state():
-	apply_air_inertia()
+func dashed_fall_state(delta: float):
+	move(delta)
+	
+	if Input.is_action_just_pressed("jump") && can_double_jump():
+		go_to_jump_state()
+		return
 	
 	if is_on_floor():
 		if velocity.x == 0:
@@ -232,7 +270,7 @@ func dashed_fall_state():
 		else:
 			go_to_walk_state()
 		return
-	if abs(velocity.x) < SPEED:
+	if abs(velocity.x) < MAX_SPEED:
 		go_to_fall_state()
 		return
 
@@ -248,27 +286,12 @@ func update_direction():
 		anim.flip_h = true
 		curr_direction = Vector2.LEFT;
 
-func move():
-	update_direction()
-	
-	# Get the input direction and handle the movement/deceleration.
-	# As good practice, you should replace UI actions with custom gameplay actions.
-	var direction := Input.get_axis("left", "right")
-
-	if direction:
-		velocity.x = direction * SPEED
-	else:
-		velocity.x = move_toward(velocity.x, 0, SPEED)
-
 func move_until_stopped():
 	update_direction()
 	
 	# Used when player can't move
 	# Apply current velocity until zero
-	velocity.x = move_toward(velocity.x, 0, SPEED)
-	
-func apply_air_inertia():
-	velocity.x = move_toward(velocity.x, 0, DASH_AIR_FRICTION * get_physics_process_delta_time())
+	velocity.x = move_toward(velocity.x, 0, MAX_SPEED)
 
 func set_lower_collision():
 	collision_shape.shape.radius = 2.84
@@ -279,3 +302,6 @@ func set_regular_collision():
 	collision_shape.shape.radius = 2.84
 	collision_shape.shape.height = 9.09
 	collision_shape.position.y = 0	
+
+func can_double_jump() -> bool:
+	return jump_count < MAX_JUMP_COUNTS

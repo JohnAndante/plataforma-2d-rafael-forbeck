@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=4 uid="uid://b647m2h84eqbo"]
+[gd_scene load_steps=13 format=4 uid="uid://b647m2h84eqbo"]
 
 [ext_resource type="Texture2D" uid="uid://cyx8dq8blin62" path="res://sprites/Seasonal Tilesets/3 - Tropics/Background parts/5 - Sky_color.png" id="1_ttii7"]
 [ext_resource type="Texture2D" uid="uid://ka0u2nmre45p" path="res://sprites/Seasonal Tilesets/3 - Tropics/Background parts/4 - Floating_clouds.png" id="2_tqg4o"]
@@ -10,6 +10,7 @@
 [ext_resource type="PackedScene" uid="uid://dj4dctx6mm3ju" path="res://entities/player.tscn" id="8_lwukm"]
 [ext_resource type="PackedScene" uid="uid://despiuhlr8mwn" path="res://entities/camera.tscn" id="9_8wtrl"]
 [ext_resource type="PackedScene" uid="uid://bgh04hv32hap7" path="res://entities/level_end.tscn" id="10_b47vl"]
+[ext_resource type="PackedScene" uid="uid://dny5mqo83ukir" path="res://entities/skeleton.tscn" id="11_tqg4o"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_t8vtq"]
 animations = [{
@@ -104,3 +105,6 @@ limit_bottom = 200
 position = Vector2(857, -62.999996)
 scale = Vector2(0.8502979, -27.731157)
 next_level = "forest"
+
+[node name="Skeleton" parent="." instance=ExtResource("11_tqg4o")]
+position = Vector2(108, 143)

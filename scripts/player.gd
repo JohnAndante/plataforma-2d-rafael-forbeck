@@ -5,8 +5,8 @@ extends CharacterBody2D
 
 @export var MAX_SPEED = 80.0
 const JUMP_VELOCITY = -300.0
-@export var ACCELERATION = 3.5 * 1000
-@export var DECELERATION = 3 * 1000
+@export var ACCELERATION = 4.5 * 1000
+@export var DECELERATION = 3.5 * 1000
 const DASH_MAX_SPEED = 200
 const DASH_AIR_FRICTION = 200
 const DASH_DURATION_SECONDS = 1
@@ -21,6 +21,7 @@ enum PlayerState {
 	dash,
 	dashed_jump,
 	dashed_fall,
+	dead,
 }
 
 var curr_state: PlayerState
@@ -54,6 +55,8 @@ func _physics_process(delta:float) -> void:
 			dashed_jump_state(delta)
 		PlayerState.dashed_fall:
 			dashed_fall_state(delta)
+		PlayerState.dead:
+			dead_state(delta)
 	move_and_slide()
 
 func go_to_idle_state():
@@ -108,6 +111,11 @@ func go_to_fall_state():
 func go_to_dashed_fall_state():
 	curr_state = PlayerState.dashed_fall
 	anim.play("falling")
+
+func go_to_dead_state():
+	curr_state = PlayerState.dead
+	anim.play("dead")
+	velocity = Vector2.ZERO
 
 func idle_state(delta: float):
 	move(delta)
@@ -251,6 +259,9 @@ func dashed_fall_state(delta: float):
 		go_to_fall_state()
 		return
 
+func dead_state(_delta):
+	pass
+
 func move(delta: float):
 	update_direction()
 	
@@ -303,3 +314,14 @@ func set_regular_collision():
 
 func can_double_jump() -> bool:
 	return jump_count < MAX_JUMP_COUNTS
+
+func _on_hitbox_area_entered(area: Area2D) -> void:
+	if curr_state == PlayerState.dead:
+		return
+		
+	if velocity.y > 0:
+		area.get_parent().queue_free()
+		jump_count -= 1
+		go_to_jump_state()
+	else:
+		go_to_dead_state()

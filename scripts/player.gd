@@ -320,7 +320,7 @@ func _on_hitbox_area_entered(area: Area2D) -> void:
 		return
 		
 	if velocity.y > 0:
-		area.get_parent().queue_free()
+		area.get_parent().take_damage()
 		jump_count -= 1
 		go_to_jump_state()
 	else:

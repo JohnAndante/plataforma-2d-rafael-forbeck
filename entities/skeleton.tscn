@@ -240,6 +240,11 @@ position = Vector2(0, -2)
 target_position = Vector2(14, 0)
 
 [node name="GroundDetector" type="RayCast2D" parent="."]
-position = Vector2(12, 5)
+position = Vector2(10, 1)
 rotation = 1.5707964
-target_position = Vector2(14, 0)
+target_position = Vector2(18, 0)
+
+[node name="TurnTimer" type="Timer" parent="."]
+one_shot = true
+
+[connection signal="timeout" from="TurnTimer" to="." method="_on_timer_timeout"]

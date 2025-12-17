@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=4 uid="uid://gmoncpafos5d"]
+[gd_scene load_steps=16 format=4 uid="uid://gmoncpafos5d"]
 
 [ext_resource type="PackedScene" uid="uid://dj4dctx6mm3ju" path="res://entities/player.tscn" id="1_e2knd"]
 [ext_resource type="TileSet" uid="uid://cqbpfv6r60jh2" path="res://tilemaps/terrain.tres" id="2_2xpkg"]
@@ -13,7 +13,6 @@
 [ext_resource type="PackedScene" uid="uid://despiuhlr8mwn" path="res://entities/camera.tscn" id="9_jo4av"]
 [ext_resource type="PackedScene" uid="uid://bgh04hv32hap7" path="res://entities/level_end.tscn" id="12_64es3"]
 [ext_resource type="PackedScene" uid="uid://dny5mqo83ukir" path="res://entities/skeleton.tscn" id="13_dabdc"]
-[ext_resource type="PackedScene" uid="uid://chva8hy0xt52q" path="res://entities/spinning_bone.tscn" id="14_cf55d"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_gwku7"]
 texture = ExtResource("3_jxvlp")
@@ -144,7 +143,7 @@ tile_map_data = PackedByteArray("AAAEAAoABAABAAEAAAARAAoABAABAAEAAAAVAAoABAABAAE
 tile_set = ExtResource("9_gwku7")
 
 [node name="Player" parent="." instance=ExtResource("1_e2knd")]
-position = Vector2(20, 184)
+position = Vector2(313, 178)
 
 [node name="Camera" parent="." instance=ExtResource("9_jo4av")]
 limit_top = 0
@@ -156,19 +155,13 @@ scale = Vector2(1, 12.159998)
 next_level = "tropic"
 
 [node name="Skeleton" parent="." instance=ExtResource("13_dabdc")]
-position = Vector2(439, 143)
+position = Vector2(370, 176)
 
 [node name="Skeleton2" parent="." instance=ExtResource("13_dabdc")]
-position = Vector2(200, 128)
+position = Vector2(199, 128)
 
 [node name="Skeleton3" parent="." instance=ExtResource("13_dabdc")]
-position = Vector2(336, 97)
+position = Vector2(333, 96)
 
 [node name="Skeleton4" parent="." instance=ExtResource("13_dabdc")]
-position = Vector2(761, 176)
-
-[node name="Skeleton5" parent="." instance=ExtResource("13_dabdc")]
-position = Vector2(635, 81)
-
-[node name="SpinningBone" parent="." instance=ExtResource("14_cf55d")]
-position = Vector2(121, 170)
+position = Vector2(491, 112)

@@ -1,7 +1,8 @@
-[gd_scene load_steps=28 format=3 uid="uid://dny5mqo83ukir"]
+[gd_scene load_steps=34 format=3 uid="uid://dny5mqo83ukir"]
 
 [ext_resource type="Script" uid="uid://vdyb50034yn4" path="res://scripts/skeleton.gd" id="1_yag7t"]
 [ext_resource type="Texture2D" uid="uid://cb32tqgxqjcvo" path="res://sprites/3 - Skeleton/Hurt (32 x 32).png" id="2_4oc3b"]
+[ext_resource type="Texture2D" uid="uid://cq8dom86j0rae" path="res://sprites/3 - Skeleton/Bone_Toss (32 x 32).png" id="2_j31jw"]
 [ext_resource type="Texture2D" uid="uid://dbs37x3i6axq0" path="res://sprites/3 - Skeleton/Limping_Movement (32 x 32).png" id="2_yag7t"]
 [ext_resource type="Texture2D" uid="uid://b4spw6h57mqin" path="res://sprites/3 - Skeleton/Crumbling_Into_Bone_Pile (32 x 32).png" id="3_6hr2a"]
 [ext_resource type="Texture2D" uid="uid://cx1uva74hvx1r" path="res://sprites/3 - Skeleton/Twitching_Idle (32 x 32).png" id="4_6hr2a"]
@@ -9,6 +10,26 @@
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_yag7t"]
 radius = 7.0
 height = 26.0
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qe8ja"]
+atlas = ExtResource("2_j31jw")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ah3kb"]
+atlas = ExtResource("2_j31jw")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_d20i5"]
+atlas = ExtResource("2_j31jw")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3a3ee"]
+atlas = ExtResource("2_j31jw")
+region = Rect2(96, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_vmakq"]
+atlas = ExtResource("2_j31jw")
+region = Rect2(128, 0, 32, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_3kifd"]
 atlas = ExtResource("2_4oc3b")
@@ -88,6 +109,26 @@ region = Rect2(160, 0, 32, 32)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_4oc3b"]
 animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qe8ja")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ah3kb")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_d20i5")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3a3ee")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_vmakq")
+}],
+"loop": false,
+"name": &"attack",
+"speed": 8.0
+}, {
 "frames": [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_3kifd")
@@ -177,7 +218,9 @@ shape = SubResource("CapsuleShape2D_yag7t")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_4oc3b")
-animation = &"idle"
+animation = &"attack"
+frame = 4
+frame_progress = 1.0
 
 [node name="Hitbox" type="Area2D" parent="."]
 collision_layer = 4

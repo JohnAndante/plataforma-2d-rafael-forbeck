@@ -51,6 +51,7 @@ func walk_state(delta: float):
 		scale.x *= -1
 
 func dead_state(_delta: float):
+	
 	pass
 
 func take_damage():

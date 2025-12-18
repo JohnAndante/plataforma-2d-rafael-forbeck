@@ -213,38 +213,53 @@ collision_layer = 4
 script = ExtResource("1_yag7t")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+visible = false
 position = Vector2(2, 3)
 shape = SubResource("CapsuleShape2D_yag7t")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_4oc3b")
 animation = &"attack"
-frame = 4
-frame_progress = 1.0
+frame = 2
+frame_progress = 0.70306176
 
 [node name="Hitbox" type="Area2D" parent="."]
+visible = false
 collision_layer = 4
 collision_mask = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+visible = false
 position = Vector2(2, 3)
 shape = SubResource("RectangleShape2D_yag7t")
 debug_color = Color(0.99351555, 0, 0.24326906, 0.41960785)
 
 [node name="WallDetector01" type="RayCast2D" parent="."]
+visible = false
 position = Vector2(0, 13)
 target_position = Vector2(14, 0)
 
 [node name="WallDetector02" type="RayCast2D" parent="."]
+visible = false
 position = Vector2(0, -2)
 target_position = Vector2(14, 0)
 
 [node name="GroundDetector" type="RayCast2D" parent="."]
+visible = false
 position = Vector2(10, 1)
 rotation = 1.5707964
 target_position = Vector2(18, 0)
 
+[node name="PlayerDetector" type="RayCast2D" parent="."]
+position = Vector2(0, 13)
+target_position = Vector2(48, 0)
+collision_mask = 2
+
 [node name="TurnTimer" type="Timer" parent="."]
 one_shot = true
 
+[node name="BoneStartingPosition" type="Node2D" parent="."]
+position = Vector2(14, -1)
+
+[connection signal="animation_finished" from="AnimatedSprite2D" to="." method="_on_animated_sprite_2d_animation_finished"]
 [connection signal="timeout" from="TurnTimer" to="." method="_on_timer_timeout"]

@@ -117,6 +117,9 @@ func go_to_dashed_fall_state():
 	anim.play("falling")
 
 func go_to_dead_state():
+	if curr_state == PlayerState.dead:
+		return
+	
 	curr_state = PlayerState.dead
 	anim.play("dead")
 	velocity.x = 0
@@ -328,18 +331,6 @@ func set_regular_hitbox():
 func can_double_jump() -> bool:
 	return jump_count < MAX_JUMP_COUNTS
 
-func _on_hitbox_area_entered(area: Area2D) -> void:
-	if curr_state == PlayerState.dead:
-		return
-	
-	if area.is_in_group("Enemies"):
-		hit_enemy(area)
-		return
-	
-	if area.is_in_group("LethalArea"):
-		hit_lethal_area()
-		return
-
 func hit_enemy(area: Area2D):
 	if velocity.y > 0:
 		area.get_parent().take_damage()
@@ -350,7 +341,19 @@ func hit_enemy(area: Area2D):
 
 func hit_lethal_area():
 	go_to_dead_state()
+	
+func _on_hitbox_area_entered(area: Area2D) -> void:
+	if area.is_in_group("Enemies"):
+		hit_enemy(area)
+		return
+	
+	if area.is_in_group("LethalArea"):
+		hit_lethal_area()
+		return
 
+func _on_hitbox_body_entered(body: Node2D) -> void:
+	if body.is_in_group("LethalArea"):
+		go_to_dead_state()
 
 func _on_reload_timer_timeout() -> void:
 	get_tree().reload_current_scene()

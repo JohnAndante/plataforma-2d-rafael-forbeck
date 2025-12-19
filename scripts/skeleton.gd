@@ -23,12 +23,11 @@ enum SkeletonState {
 	idle,
 }
 
-var curr_status: SkeletonState
+@export var curr_status: SkeletonState = SkeletonState.walk
 var curr_direction := Vector2.RIGHT
 
 func _ready() -> void:
 	turn_timer.start()
-	go_to_idle_state()
 
 func _physics_process(delta: float) -> void:
 	if not is_on_floor():

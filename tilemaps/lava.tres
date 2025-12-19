@@ -1,0 +1,23 @@
+[gd_resource type="TileSet" load_steps=3 format=3 uid="uid://bwfb0oam0w1js"]
+
+[ext_resource type="Texture2D" uid="uid://dqi0vfhjtk2q3" path="res://sprites/Seasonal Tilesets/5 - Misc. universal tiles/Lava_frames (16 x 32).png" id="1_xjeot"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_8nshd"]
+texture = ExtResource("1_xjeot")
+0:0/animation_frame_0/duration = 0.1
+0:0/animation_frame_1/duration = 0.1
+0:0/animation_frame_2/duration = 0.1
+0:0/animation_frame_3/duration = 0.1
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -1.1690817, 8, -1.1690817, 8, 8, -8, 8)
+0:1/animation_frame_0/duration = 0.1
+0:1/animation_frame_1/duration = 0.1
+0:1/animation_frame_2/duration = 0.1
+0:1/animation_frame_3/duration = 0.1
+0:1/0 = 0
+0:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+
+[resource]
+physics_layer_0/collision_layer = 16
+physics_layer_0/collision_mask = 2
+sources/0 = SubResource("TileSetAtlasSource_8nshd")

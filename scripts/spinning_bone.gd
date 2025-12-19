@@ -11,3 +11,12 @@ func _process(delta: float) -> void:
 func set_direction(new_direction) -> void:
 	self.curr_direction = Vector2(new_direction, 0)
 	anim.flip_h = new_direction < 0
+
+func _on_self_destruct_timer_timeout() -> void:
+	queue_free()
+
+func _on_area_entered(_area: Area2D) -> void:
+	queue_free()
+
+func _on_body_entered(_body: Node2D) -> void:
+	queue_free()

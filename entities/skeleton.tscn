@@ -223,7 +223,7 @@ animation = &"attack"
 frame = 2
 frame_progress = 0.70306176
 
-[node name="Hitbox" type="Area2D" parent="."]
+[node name="Hitbox" type="Area2D" parent="." groups=["Enemies"]]
 visible = false
 collision_layer = 4
 collision_mask = 2

@@ -2,6 +2,7 @@ extends CharacterBody2D
 
 @onready var anim: AnimatedSprite2D = $AnimatedSprite2D
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
+@onready var hitbox_collision_shape: CollisionShape2D = $Hitbox/CollisionShape2D
 @onready var reload_timer: Timer = $ReloadTimer
 
 @export var MAX_SPEED = 80.0
@@ -69,9 +70,11 @@ func go_to_duck_state():
 	anim.play("duck")
 	
 	set_lower_collision()
+	set_lower_hitbox()
 
 func exit_from_duck_state():
 	set_regular_collision()
+	set_regular_hitbox()
 
 func go_to_walk_state():
 	curr_state = PlayerState.walk
@@ -116,7 +119,7 @@ func go_to_dashed_fall_state():
 func go_to_dead_state():
 	curr_state = PlayerState.dead
 	anim.play("dead")
-	velocity = Vector2.ZERO
+	velocity.x = 0
 	reload_timer.start()
 
 func idle_state(delta: float):
@@ -309,10 +312,18 @@ func set_lower_collision():
 	collision_shape.shape.height = 5.68
 	collision_shape.position.y = 3
 
+func set_lower_hitbox():
+	hitbox_collision_shape.shape.size.y = 11
+	hitbox_collision_shape.position.y = 2.5
+
 func set_regular_collision():
 	collision_shape.shape.radius = 2.84
 	collision_shape.shape.height = 9.09
-	collision_shape.position.y = 0	
+	collision_shape.position.y = 0
+
+func set_regular_hitbox():
+	hitbox_collision_shape.shape.size.y = 16
+	hitbox_collision_shape.position.y = 0
 
 func can_double_jump() -> bool:
 	return jump_count < MAX_JUMP_COUNTS
@@ -320,13 +331,26 @@ func can_double_jump() -> bool:
 func _on_hitbox_area_entered(area: Area2D) -> void:
 	if curr_state == PlayerState.dead:
 		return
-		
+	
+	if area.is_in_group("Enemies"):
+		hit_enemy(area)
+		return
+	
+	if area.is_in_group("LethalArea"):
+		hit_lethal_area()
+		return
+
+func hit_enemy(area: Area2D):
 	if velocity.y > 0:
 		area.get_parent().take_damage()
 		jump_count -= 1
 		go_to_jump_state()
 	else:
 		go_to_dead_state()
+
+func hit_lethal_area():
+	go_to_dead_state()
+
 
 func _on_reload_timer_timeout() -> void:
 	get_tree().reload_current_scene()

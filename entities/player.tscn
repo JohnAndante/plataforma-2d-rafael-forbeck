@@ -209,12 +209,12 @@ shape = SubResource("CapsuleShape2D_4qnqm")
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 z_index = 1
 sprite_frames = SubResource("SpriteFrames_merdl")
-animation = &"walk"
+animation = &"duck"
 autoplay = "idle"
 
 [node name="Hitbox" type="Area2D" parent="."]
 collision_layer = 2
-collision_mask = 4
+collision_mask = 20
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
 shape = SubResource("RectangleShape2D_6nm46")

@@ -11,7 +11,7 @@ const SPINNING_BONE = preload("res://entities/spinning_bone.tscn")
 @onready var turn_timer: Timer = $TurnTimer
 @onready var bone_starting_position: Node2D = $BoneStartingPosition
 
-const SPEED = 10 * 100
+const SPEED = 8 * 100
 const JUMP_VELOCITY = -400.0
 var will_turn := false
 var can_throw := true
@@ -74,7 +74,11 @@ func attack_state(_delta: float):
 
 func walk_state(delta: float):
 	var direction := curr_direction.x
-	velocity.x = SPEED * direction * delta
+	
+	if [3, 4].has(anim.frame):
+		velocity.x = SPEED * direction * delta
+	else:
+		velocity.x = 0
 	
 	if must_attack():
 		go_to_attack_state()

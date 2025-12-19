@@ -59,7 +59,11 @@ func _physics_process(delta:float) -> void:
 			dashed_fall_state(delta)
 		PlayerState.dead:
 			dead_state(delta)
+	
 	move_and_slide()
+	
+	if is_on_floor():
+		jump_count = 0
 
 func go_to_idle_state():
 	curr_state = PlayerState.idle
@@ -104,6 +108,7 @@ func go_to_dashed_jump_state():
 	curr_state = PlayerState.dashed_jump
 	anim.play("jump")
 	velocity.y = JUMP_VELOCITY * 1.1
+	jump_count += 1
 
 func go_to_fall_state():
 	if velocity.y < 0:
@@ -162,7 +167,7 @@ func walk_state(delta: float):
 		go_to_jump_state()
 		return
 	if !is_on_floor():
-		jump_count += 1
+		jump_count = 1
 		go_to_fall_state()
 		return
 	if Input.is_action_just_pressed("down"):
@@ -173,19 +178,18 @@ func walk_state(delta: float):
 		return
 
 func dash_state(delta: float):
-	dash_timer -= delta
+	dash_timer -= delta 
 	move(delta)
-	
-	if !is_on_floor() && Input.is_action_just_pressed("jump"):
-		jump_count -= 1
-		if can_double_jump():
+		
+	if Input.is_action_just_pressed("jump"):
+		if is_on_floor():
+			exit_from_dash_state()
+			go_to_dashed_jump_state()
+			return
+		elif can_double_jump():
+			exit_from_dash_state()
 			go_to_jump_state()
 			return
-	
-	if Input.is_action_just_pressed("jump") and is_on_floor():
-		exit_from_dash_state()
-		go_to_dashed_jump_state()
-		return
 	
 	if Input.is_action_just_released("dash") or dash_timer <= 0:
 		exit_from_dash_state()
@@ -277,13 +281,12 @@ func move(delta: float):
 	# As good practice, you should replace UI actions with custom gameplay actions.
 	var direction := Input.get_axis("left", "right")
 	
-	if PlayerState.dash:
+	if curr_state == PlayerState.dash:
 		velocity.x = move_toward(velocity.x, direction * MAX_SPEED, DASH_AIR_FRICTION * delta)
 		return
 	
-	if PlayerState.dashed_fall || PlayerState.dashed_jump:
+	if curr_state == PlayerState.dashed_fall || curr_state == PlayerState.dashed_jump:
 		velocity.x = move_toward(velocity.x, direction * MAX_SPEED, DASH_AIR_FRICTION * delta)
-		#velocity.x = direction * MAX_SPEED
 		return
 	
 	if direction:
@@ -321,8 +324,8 @@ func set_lower_hitbox():
 
 func set_regular_collision():
 	collision_shape.shape.radius = 2.84
-	collision_shape.shape.height = 9.09
-	collision_shape.position.y = 0
+	collision_shape.shape.height = 8.4
+	collision_shape.position.y = 0.6
 
 func set_regular_hitbox():
 	hitbox_collision_shape.shape.size.y = 16
@@ -334,7 +337,7 @@ func can_double_jump() -> bool:
 func hit_enemy(area: Area2D):
 	if velocity.y > 0:
 		area.get_parent().take_damage()
-		jump_count -= 1
+		jump_count = 0
 		go_to_jump_state()
 	else:
 		go_to_dead_state()

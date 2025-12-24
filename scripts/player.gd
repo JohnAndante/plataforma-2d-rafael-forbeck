@@ -31,6 +31,7 @@ enum PlayerState {
 	dashed_fall,
 	wall_slide,
 	wall_dash,
+	swimming,
 	dead,
 }
 
@@ -64,6 +65,8 @@ func _physics_process(delta: float) -> void:
 			wall_slide_state(delta)
 		PlayerState.wall_dash:
 			wall_dash_state(delta)
+		PlayerState.swimming:
+			swimming_state(delta)
 		PlayerState.dead:
 			dead_state(delta)
 	
@@ -153,6 +156,10 @@ func go_to_wall_dash_state():
 	velocity.x = 0
 	
 	dash_timer = 0.3
+
+func go_to_swimming_state():
+	curr_state = PlayerState.swimming
+	anim.play("swimming")
 
 func go_to_dead_state():
 	if curr_state == PlayerState.dead:
@@ -371,6 +378,9 @@ func wall_dash_state(delta: float):
 	if is_on_ceiling():
 		go_to_fall_state()
 
+func swimming_state(_delta: float):
+	pass
+
 func dead_state(delta):
 	apply_gravity(delta)
 
@@ -467,6 +477,11 @@ func _on_hitbox_area_entered(area: Area2D) -> void:
 func _on_hitbox_body_entered(body: Node2D) -> void:
 	if body.is_in_group("LethalArea"):
 		go_to_dead_state()
+		return
+		
+	if body.is_in_group("Water"):
+		go_to_swimming_state()
+		return
 
 func _on_reload_timer_timeout() -> void:
 	get_tree().reload_current_scene()

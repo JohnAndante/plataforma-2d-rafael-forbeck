@@ -472,7 +472,7 @@ func _on_reload_timer_timeout() -> void:
 	get_tree().reload_current_scene()
 
 func is_left_wall_colliding() -> bool:
-	return left_wall_detector_1.is_colliding() and left_wall_detector_2.is_colliding()
+	return left_wall_detector_1.is_colliding() and left_wall_detector_2.is_colliding() and is_on_wall()
 
 func is_right_wall_colliding() -> bool:
-	return right_wall_detector_1.is_colliding() and right_wall_detector_2.is_colliding()
+	return right_wall_detector_1.is_colliding() and right_wall_detector_2.is_colliding() and is_on_wall()

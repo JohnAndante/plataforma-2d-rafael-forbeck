@@ -1,4 +1,4 @@
-[gd_scene load_steps=34 format=3 uid="uid://dj4dctx6mm3ju"]
+[gd_scene load_steps=39 format=3 uid="uid://dj4dctx6mm3ju"]
 
 [ext_resource type="Script" uid="uid://xeffgv1ctbx8" path="res://scripts/player.gd" id="1_merdl"]
 [ext_resource type="Texture2D" uid="uid://d3t3jn5tj8mrk" path="res://sprites/1 - Penguin/Belly_Sliding (16 x 16).png" id="2_6nm46"]
@@ -10,6 +10,7 @@
 [ext_resource type="Texture2D" uid="uid://cseb1q1ncpwb6" path="res://sprites/1 - Penguin/Jump (16 x 16).png" id="4_qsoyl"]
 [ext_resource type="Texture2D" uid="uid://bwafoeqawqd8w" path="res://sprites/1 - Penguin/Hurt (16 x 16).png" id="4_x08pd"]
 [ext_resource type="Texture2D" uid="uid://dw3xkep2vhvbf" path="res://sprites/1 - Penguin/Lying_On_Ground (16 x 16).png" id="5_dchgp"]
+[ext_resource type="Texture2D" uid="uid://krwntnqwrk7l" path="res://sprites/1 - Penguin/Wall_Slide (16x16).png" id="11_x08pd"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_4qnqm"]
 radius = 2.8409088
@@ -94,6 +95,22 @@ region = Rect2(64, 0, 16, 16)
 [sub_resource type="AtlasTexture" id="AtlasTexture_kdgjc"]
 atlas = ExtResource("3_e4p34")
 region = Rect2(80, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hj0ki"]
+atlas = ExtResource("11_x08pd")
+region = Rect2(48, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fruft"]
+atlas = ExtResource("11_x08pd")
+region = Rect2(32, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_slxql"]
+atlas = ExtResource("11_x08pd")
+region = Rect2(16, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_evlff"]
+atlas = ExtResource("11_x08pd")
+region = Rect2(0, 0, 16, 16)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_merdl"]
 animations = [{
@@ -191,6 +208,23 @@ animations = [{
 "loop": true,
 "name": &"walk",
 "speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hj0ki")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fruft")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_slxql")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_evlff")
+}],
+"loop": true,
+"name": &"wall_slide",
+"speed": 8.0
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_6nm46"]
@@ -211,7 +245,7 @@ shape = SubResource("CapsuleShape2D_4qnqm")
 z_index = 1
 position = Vector2(0, 0.1)
 sprite_frames = SubResource("SpriteFrames_merdl")
-animation = &"idle"
+animation = &"falling"
 autoplay = "idle"
 
 [node name="Hitbox" type="Area2D" parent="."]
@@ -225,6 +259,28 @@ debug_color = Color(0.98715943, 0, 0.3209404, 0.41960785)
 [node name="ReloadTimer" type="Timer" parent="."]
 wait_time = 2.0
 one_shot = true
+
+[node name="WallDetectors" type="Node2D" parent="."]
+
+[node name="LeftWallDetector1" type="RayCast2D" parent="WallDetectors"]
+z_index = 2
+position = Vector2(0, 3)
+target_position = Vector2(-8, 0)
+
+[node name="LeftWallDetector2" type="RayCast2D" parent="WallDetectors"]
+z_index = 2
+position = Vector2(0, -2)
+target_position = Vector2(-8, 0)
+
+[node name="RightWallDetector1" type="RayCast2D" parent="WallDetectors"]
+z_index = 2
+position = Vector2(0, -2)
+target_position = Vector2(8, 0)
+
+[node name="RightWallDetector2" type="RayCast2D" parent="WallDetectors"]
+z_index = 2
+position = Vector2(0, 3)
+target_position = Vector2(8, 0)
 
 [connection signal="area_entered" from="Hitbox" to="." method="_on_hitbox_area_entered"]
 [connection signal="body_entered" from="Hitbox" to="." method="_on_hitbox_body_entered"]

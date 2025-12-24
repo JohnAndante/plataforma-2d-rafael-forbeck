@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Plataforma2D-Rafael_Forbeck"
-run/main_scene="uid://gmoncpafos5d"
+run/main_scene="uid://b647m2h84eqbo"
 config/features=PackedStringArray("4.5", "Mobile")
 config/icon="res://icon.svg"
 

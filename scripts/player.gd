@@ -4,6 +4,10 @@ extends CharacterBody2D
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
 @onready var hitbox_collision_shape: CollisionShape2D = $Hitbox/CollisionShape2D
 @onready var reload_timer: Timer = $ReloadTimer
+@onready var left_wall_detector_1: RayCast2D = $WallDetectors/LeftWallDetector1
+@onready var left_wall_detector_2: RayCast2D = $WallDetectors/LeftWallDetector2
+@onready var right_wall_detector_1: RayCast2D = $WallDetectors/RightWallDetector1
+@onready var right_wall_detector_2: RayCast2D = $WallDetectors/RightWallDetector2
 
 @export var MAX_SPEED = 80.0
 const JUMP_VELOCITY = -300.0
@@ -13,6 +17,8 @@ const DASH_MAX_SPEED = 200
 const DASH_AIR_FRICTION = 200
 const DASH_DURATION_SECONDS = 1
 @export var MAX_JUMP_COUNTS = 2
+@export var WALL_SLIDE_GRIP_PERC := 60 * 0.01
+@export var WALL_JUMP_VELOCITY := 600.0
 
 enum PlayerState {
 	idle,
@@ -23,6 +29,8 @@ enum PlayerState {
 	dash,
 	dashed_jump,
 	dashed_fall,
+	wall_slide,
+	wall_dash,
 	dead,
 }
 
@@ -34,12 +42,7 @@ var jump_count := 0
 func _ready() -> void:
 	go_to_idle_state()
 
-func _physics_process(delta:float) -> void:
-	
-	# Add the gravity.
-	if not is_on_floor():
-		velocity += get_gravity() * delta
-		
+func _physics_process(delta: float) -> void:
 	match curr_state:
 		PlayerState.idle:
 			idle_state(delta)
@@ -57,6 +60,10 @@ func _physics_process(delta:float) -> void:
 			dashed_jump_state(delta)
 		PlayerState.dashed_fall:
 			dashed_fall_state(delta)
+		PlayerState.wall_slide:
+			wall_slide_state(delta)
+		PlayerState.wall_dash:
+			wall_dash_state(delta)
 		PlayerState.dead:
 			dead_state(delta)
 	
@@ -121,6 +128,32 @@ func go_to_dashed_fall_state():
 	curr_state = PlayerState.dashed_fall
 	anim.play("falling")
 
+func go_to_wall_slide_state():
+	curr_state = PlayerState.wall_slide
+	anim.play("wall_slide")
+	jump_count = 0
+
+func go_to_wall_jump_state():
+	var direction = -1 if is_right_wall_colliding() else 1
+	velocity.y = JUMP_VELOCITY
+	velocity.x = direction * WALL_JUMP_VELOCITY
+	
+	anim.flip_h = (direction == -1)
+	curr_direction.x = direction
+	
+	jump_count = 1
+	curr_state = PlayerState.jump
+	anim.play("jump")
+
+func go_to_wall_dash_state():
+	curr_state = PlayerState.wall_dash
+	anim.play("jump")
+	
+	velocity.y = JUMP_VELOCITY * WALL_SLIDE_GRIP_PERC
+	velocity.x = 0
+	
+	dash_timer = 0.3
+
 func go_to_dead_state():
 	if curr_state == PlayerState.dead:
 		return
@@ -131,6 +164,7 @@ func go_to_dead_state():
 	reload_timer.start()
 
 func idle_state(delta: float):
+	apply_gravity(delta)
 	move(delta)
 		
 	if velocity.x != 0:
@@ -149,7 +183,8 @@ func idle_state(delta: float):
 		go_to_dash_state()
 		return
 
-func duck_state(_delta: float):
+func duck_state(delta: float):
+	apply_gravity(delta)
 	move_until_stopped()
 	
 	if Input.is_action_just_released("down"):
@@ -158,6 +193,7 @@ func duck_state(_delta: float):
 		return
 
 func walk_state(delta: float):
+	apply_gravity(delta)
 	move(delta)
 	
 	if velocity.x == 0:
@@ -179,6 +215,7 @@ func walk_state(delta: float):
 
 func dash_state(delta: float):
 	dash_timer -= delta 
+	apply_gravity(delta)
 	move(delta)
 		
 	if Input.is_action_just_pressed("jump"):
@@ -201,6 +238,7 @@ func dash_state(delta: float):
 		return
 
 func jump_state(delta: float):
+	apply_gravity(delta)
 	move(delta)
 	
 	if velocity.y < 0 && Input.is_action_just_released("jump"):
@@ -224,6 +262,7 @@ func jump_state(delta: float):
 		return
 
 func dashed_jump_state(delta: float):
+	apply_gravity(delta)
 	move(delta)
 	
 	if velocity.y < 0 and Input.is_action_just_released("jump"):
@@ -234,11 +273,19 @@ func dashed_jump_state(delta: float):
 		return
 
 func fall_state(delta: float):
+	apply_gravity(delta)
 	move(delta)
 	
 	if Input.is_action_just_pressed("jump") && can_double_jump():
 		go_to_jump_state()
 		return
+		
+	var direction := Input.get_axis("left", "right")
+		
+	if is_left_wall_colliding() and direction < 0: 
+		go_to_wall_slide_state()
+	elif is_right_wall_colliding() and direction > 0:
+		go_to_wall_slide_state()
 	
 	if velocity.y != 0:
 		return 
@@ -255,6 +302,7 @@ func fall_state(delta: float):
 		return
 
 func dashed_fall_state(delta: float):
+	apply_gravity(delta)
 	move(delta)
 	
 	if Input.is_action_just_pressed("jump") && can_double_jump():
@@ -271,10 +319,67 @@ func dashed_fall_state(delta: float):
 		go_to_fall_state()
 		return
 
+func wall_slide_state(delta: float):
+	apply_gravity(delta)
+	
+	if is_left_wall_colliding():
+		anim.flip_h = false
+	elif is_right_wall_colliding():
+		anim.flip_h = true
+	
+	if is_on_floor():
+		go_to_idle_state()
+		return
+	
+	if Input.is_action_just_pressed("jump"):
+		go_to_wall_jump_state()
+		return
+	
+	if Input.is_action_just_pressed("dash"):
+		go_to_wall_dash_state()
+		return
+	
+	if Input.is_action_pressed("down"):
+		go_to_fall_state()
+		return
+	
+	if !is_left_wall_colliding() and !is_right_wall_colliding():
+		go_to_fall_state()
+		return
+
+func wall_jump_state():
+	pass
+
+func wall_dash_state(delta: float):
+	dash_timer -= delta
+	
+	# Manter o personagem colado na parede durante a subida
+	# Isso evita que ele pare de subir se você soltar o analógico
+	velocity.x = 0 
+	
+	if Input.is_action_just_pressed("jump"):
+		go_to_wall_jump_state()
+		return
+
+	if dash_timer <= 0 or velocity.y >= 0:
+		if is_left_wall_colliding() or is_right_wall_colliding():
+			go_to_wall_slide_state()
+		else:
+			go_to_fall_state()
+		return
+		
+	if is_on_ceiling():
+		go_to_fall_state()
+
 func dead_state(_delta):
 	pass
 
 func move(delta: float):
+	
+	if curr_state == PlayerState.wall_slide or curr_state == PlayerState.wall_dash:
+		velocity.x = 0
+		return
+	
 	update_direction()
 	
 	# Get the input direction and handle the movement/deceleration.
@@ -294,6 +399,14 @@ func move(delta: float):
 	else:
 		velocity.x = move_toward(velocity.x, 0, DECELERATION * delta)
 
+func apply_gravity(delta: float):
+	if not is_on_floor():
+		if curr_state == PlayerState.wall_slide:
+			velocity += get_gravity() * wall_min_slide_angle * delta 
+			velocity.y = min(velocity.y, MAX_SPEED * 0.8) 
+		else:
+			velocity += get_gravity() * delta
+
 func update_direction():
 	var direction := Input.get_axis("left", "right")
 	
@@ -308,9 +421,6 @@ func update_direction():
 
 func move_until_stopped():
 	update_direction()
-	
-	# Used when player can't move
-	# Apply current velocity until zero
 	velocity.x = move_toward(velocity.x, 0, MAX_SPEED)
 
 func set_lower_collision():
@@ -360,3 +470,9 @@ func _on_hitbox_body_entered(body: Node2D) -> void:
 
 func _on_reload_timer_timeout() -> void:
 	get_tree().reload_current_scene()
+
+func is_left_wall_colliding() -> bool:
+	return left_wall_detector_1.is_colliding() and left_wall_detector_2.is_colliding()
+
+func is_right_wall_colliding() -> bool:
+	return right_wall_detector_1.is_colliding() and right_wall_detector_2.is_colliding()

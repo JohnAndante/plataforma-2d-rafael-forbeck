@@ -160,7 +160,7 @@ func go_to_dead_state():
 	
 	curr_state = PlayerState.dead
 	anim.play("dead")
-	velocity.x = 0
+	velocity = Vector2.ZERO
 	reload_timer.start()
 
 func idle_state(delta: float):
@@ -371,8 +371,8 @@ func wall_dash_state(delta: float):
 	if is_on_ceiling():
 		go_to_fall_state()
 
-func dead_state(_delta):
-	pass
+func dead_state(delta):
+	apply_gravity(delta)
 
 func move(delta: float):
 	

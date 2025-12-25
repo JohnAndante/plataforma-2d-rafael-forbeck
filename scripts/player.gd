@@ -8,6 +8,7 @@ extends CharacterBody2D
 @onready var left_wall_detector_2: RayCast2D = $WallDetectors/LeftWallDetector2
 @onready var right_wall_detector_1: RayCast2D = $WallDetectors/RightWallDetector1
 @onready var right_wall_detector_2: RayCast2D = $WallDetectors/RightWallDetector2
+@onready var bubble_particles: GPUParticles2D = $BubbleParticles
 
 @export var MAX_SPEED = 80.0
 const JUMP_VELOCITY = -300.0
@@ -19,6 +20,11 @@ const DASH_DURATION_SECONDS = 1
 @export var MAX_JUMP_COUNTS = 2
 @export var WALL_SLIDE_GRIP_PERC := 60 * 0.01
 @export var WALL_JUMP_VELOCITY := 600.0
+var UNDERWATER_FRICTION = 200
+var UNDERWATER_JUMP_VELOCITY = -180
+const WATER_ACCEL = 200
+const WATER_FRICTION = 100
+const WATER_DASH_SPEED = 150.0
 
 enum PlayerState {
 	idle,
@@ -32,6 +38,7 @@ enum PlayerState {
 	wall_slide,
 	wall_dash,
 	swimming,
+	underwater_dash,
 	dead,
 }
 
@@ -39,6 +46,7 @@ var curr_state: PlayerState
 var curr_direction: Vector2 = Vector2.RIGHT;
 var dash_timer
 var jump_count := 0
+var underwater_jump_timer := 0.0
 
 func _ready() -> void:
 	go_to_idle_state()
@@ -67,6 +75,8 @@ func _physics_process(delta: float) -> void:
 			wall_dash_state(delta)
 		PlayerState.swimming:
 			swimming_state(delta)
+		PlayerState.underwater_dash:
+			underwater_dash_state(delta)
 		PlayerState.dead:
 			dead_state(delta)
 	
@@ -160,6 +170,21 @@ func go_to_wall_dash_state():
 func go_to_swimming_state():
 	curr_state = PlayerState.swimming
 	anim.play("swimming")
+	velocity.y = min(velocity.y, 100)
+	set_lower_collision()
+	set_lower_hitbox()
+	bubble_particles.emitting = true
+	bubble_particles.amount_ratio = 0.02
+
+func exit_from_swimming_state():
+	bubble_particles.emitting = false
+
+func go_to_underwater_dash_state():
+	curr_state = PlayerState.underwater_dash
+	velocity.y = 0
+	velocity.x = curr_direction.x * WATER_DASH_SPEED
+	bubble_particles.amount_ratio = 1.0
+	dash_timer = 0.4
 
 func go_to_dead_state():
 	if curr_state == PlayerState.dead:
@@ -378,14 +403,21 @@ func wall_dash_state(delta: float):
 	if is_on_ceiling():
 		go_to_fall_state()
 
-func swimming_state(_delta: float):
-	pass
+func swimming_state(delta: float):
+	apply_underwater_gravity(delta)
+	move_underwater(delta)
+
+func underwater_dash_state(delta: float):
+	dash_timer -= delta 
+	
+	if Input.is_action_just_released("dash") or dash_timer <= 0:
+		bubble_particles.amount_ratio = 0.02
+		curr_state = PlayerState.swimming
 
 func dead_state(delta):
 	apply_gravity(delta)
 
 func move(delta: float):
-	
 	if curr_state == PlayerState.wall_slide or curr_state == PlayerState.wall_dash:
 		velocity.x = 0
 		return
@@ -409,13 +441,51 @@ func move(delta: float):
 	else:
 		velocity.x = move_toward(velocity.x, 0, DECELERATION * delta)
 
+func move_underwater(delta: float):
+	if underwater_jump_timer > 0:
+		underwater_jump_timer -= delta
+	
+	if Input.is_action_just_pressed("dash"):
+		go_to_underwater_dash_state()
+		return
+	
+	if Input.is_action_just_pressed("jump") and underwater_jump_timer <= 0:
+		velocity.y = UNDERWATER_JUMP_VELOCITY
+		underwater_jump_timer = 0.2
+		create_bubble_burst(0.05)
+	
+	var direction := Input.get_axis("left", "right")
+	
+	if direction:
+		velocity.x = move_toward(velocity.x, direction * MAX_SPEED, WATER_ACCEL * delta)
+	else:
+		velocity.x = move_toward(velocity.x, 0, WATER_FRICTION * delta)
+	
+	update_direction()
+
+func create_bubble_burst(duration := 1.0):
+	bubble_particles.amount_ratio = 1.0
+	await get_tree().create_timer(duration).timeout
+	if curr_state == PlayerState.swimming:
+		bubble_particles.amount_ratio = 0.02
+
 func apply_gravity(delta: float):
-	if not is_on_floor():
-		if curr_state == PlayerState.wall_slide:
-			velocity += get_gravity() * wall_min_slide_angle * delta 
-			velocity.y = min(velocity.y, MAX_SPEED * 0.8) 
-		else:
-			velocity += get_gravity() * delta
+	if is_on_floor():
+		return
+	
+	if curr_state == PlayerState.wall_slide:
+		velocity += get_gravity() * wall_min_slide_angle * delta 
+		velocity.y = min(velocity.y, MAX_SPEED * 0.8) 
+		return
+	
+	velocity += get_gravity() * delta
+
+func apply_underwater_gravity(delta: float):
+	if is_on_floor():
+		return
+	
+	velocity += get_gravity() * delta
+	velocity.y = min(velocity.y, MAX_SPEED * 0.4)
 
 func update_direction():
 	var direction := Input.get_axis("left", "right")
@@ -481,6 +551,13 @@ func _on_hitbox_body_entered(body: Node2D) -> void:
 		
 	if body.is_in_group("Water"):
 		go_to_swimming_state()
+		return
+
+func _on_hitbox_body_exited(body: Node2D) -> void:
+	if body.is_in_group("Water"):
+		exit_from_swimming_state()
+		jump_count = 0
+		go_to_jump_state()
 		return
 
 func _on_reload_timer_timeout() -> void:

@@ -30,7 +30,7 @@ animations = [{
 
 [node name="Tropic" type="Node2D"]
 metadata/_edit_vertical_guides_ = [849.0]
-metadata/_edit_horizontal_guides_ = [512.0]
+metadata/_edit_horizontal_guides_ = [512.0, 187.0]
 
 [node name="ParallaxBackground" type="ParallaxBackground" parent="."]
 

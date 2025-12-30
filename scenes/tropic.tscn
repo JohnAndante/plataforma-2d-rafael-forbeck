@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=4 uid="uid://b647m2h84eqbo"]
+[gd_scene load_steps=16 format=4 uid="uid://b647m2h84eqbo"]
 
 [ext_resource type="Texture2D" uid="uid://cyx8dq8blin62" path="res://sprites/Seasonal Tilesets/3 - Tropics/Background parts/5 - Sky_color.png" id="1_ttii7"]
 [ext_resource type="Texture2D" uid="uid://ka0u2nmre45p" path="res://sprites/Seasonal Tilesets/3 - Tropics/Background parts/4 - Floating_clouds.png" id="2_tqg4o"]
@@ -13,6 +13,7 @@
 [ext_resource type="TileSet" uid="uid://dxf3e0w1dx43p" path="res://tilemaps/underwater.tres" id="9_o3kau"]
 [ext_resource type="PackedScene" uid="uid://bgh04hv32hap7" path="res://entities/level_end.tscn" id="10_b47vl"]
 [ext_resource type="PackedScene" uid="uid://dny5mqo83ukir" path="res://entities/skeleton.tscn" id="11_tqg4o"]
+[ext_resource type="PackedScene" uid="uid://d1fbrke2kkq5l" path="res://entities/moving_platform.tscn" id="14_g24r1"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_t8vtq"]
 animations = [{
@@ -127,3 +128,20 @@ next_level = "forest"
 
 [node name="Skeleton" parent="." instance=ExtResource("11_tqg4o")]
 position = Vector2(108, 143)
+
+[node name="MovingPlatform" parent="." instance=ExtResource("14_g24r1")]
+position = Vector2(57, 128)
+time = 6
+
+[node name="Target" parent="MovingPlatform" index="1"]
+position = Vector2(0, -358)
+
+[node name="MovingPlatform2" parent="." instance=ExtResource("14_g24r1")]
+position = Vector2(57, -384)
+time = 6
+
+[node name="Target" parent="MovingPlatform2" index="1"]
+position = Vector2(0, -358)
+
+[editable path="MovingPlatform"]
+[editable path="MovingPlatform2"]
